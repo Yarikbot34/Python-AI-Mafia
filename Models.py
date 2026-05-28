@@ -1,4 +1,5 @@
 from openai import OpenAI
+from collections import Counter
 
 listModels = {
     "Grok": "x-ai/grok-4.3",
@@ -24,6 +25,22 @@ class AIplayer:
     client = None
     messeges = [""]
     players = []
+    voteList = []
+
+    def VoteResult(mafia: bool):
+        voteList = AIplayer.voteList
+        messeges = AIplayer.messeges
+        vote = Counter(voteList).most_common(2)
+        if vote[0][1] == vote[1][1]:
+            if  mafia: text = "Прошедшей ночью никто не был убит"
+            else:  text = "Жители не смогли прийти к единому мнению, на голосовании никто не был исключен"
+        else:
+            AIplayer.players.remove(vote[0][0])
+            if  mafia: text = f"{vote[0][0]} был убит мафией"
+            else:  text = f"{vote[0][0]} был исключен"
+        messeges.append(text)
+        AIplayer.voteList = []
+        return text
 
     def __init__(self, modelName: str):
         if modelName in listModels:
@@ -52,16 +69,17 @@ class AIplayer:
     def Introduce(self):
         return self.getAnswer("Твой ход, тебе нужно представить себя подобающим образом перед другими игроками")
 
+
+
     def MafiaStep(self):
         if self.role == "mafia":
-            answ = self.getAnswer("Настала ночь. Твой ход. Нужно выбрать того, кто станет жертвой мафии в эту ночь. В конце сообщения напиши \"Исключить:ИмяАппонента\" После этого ничего не писать, даже точку.")
+            answ = self.getAnswer("Настала ночь. Твой ход. Нужно выбрать того, кто станет жертвой мафии в эту ночь.По возможности распиши свои рассуждения. В конце сообщения напиши \"Исключить:ИмяАппонента\" После этого ничего не писать, даже точку.")
             who = answ.split("Исключить:")[1]
             if who in AIplayer.players:
-                AIplayer.players.remove(who)
-                AIplayer.messeges.append("Ночью был убит " + who)
+                AIplayer.voteList.append(who)
             return answ
         else:
-            return self.modelName + "спит"
+            return self.modelName + " спит"
 
     def Disput(self):
         answ = self.getAnswer(
@@ -69,6 +87,5 @@ class AIplayer:
         AIplayer.messeges.append(answ)
         who = answ.split("Исключить:")[1]
         if who in AIplayer.players:
-            AIplayer.players.remove(who)
-            AIplayer.messeges.append("На голосовании был исключен" + who)
+            AIplayer.voteList.append(who)
         return answ

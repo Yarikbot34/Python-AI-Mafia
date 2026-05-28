@@ -1,10 +1,14 @@
 from openai import OpenAI
+
 from openai.types.conversations import message
 
 from Models import AIplayer
 
 
+
+
 def startGame():
+    print("Первая встеча")
     for model in models:
         answ = model.Introduce()
         answ = f"{model.modelName} : {answ}"
@@ -12,14 +16,18 @@ def startGame():
         AIplayer.messeges.append(answ)
 
 def NightGame():
+    print("\nНаступает ночь\n")
     for model in models:
         answ = model.MafiaStep()
         print(answ)
+    AIplayer.VoteResult(True)
 
 def DayGame():
+    print("\nНаступает день\n")
     for model in models:
         answ = model.Disput()
         print(answ)
+    AIplayer.VoteResult(False)
 
 
 key = input("Enter your API key from openrouter: ")
@@ -43,6 +51,8 @@ models[2].setRole("Мирный")
 models[3].setRole("Мирный")
 
 startGame()
+NightGame()
+DayGame()
 NightGame()
 DayGame()
 
