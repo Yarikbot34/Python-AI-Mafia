@@ -5,7 +5,12 @@ listModels = {
     "Grok": "x-ai/grok-4.3",
     "Qwen":"qwen/qwen3.7-max",
     "Mistral": "mistralai/mistral-medium-3-5",
-    "Nemotron": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
+    "Nemotron": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+    "Laguna":"poolside/laguna-m.1:free",
+    "Deepseek":"deepseek/deepseek-v4-flash:free",
+    "GPT":"openai/gpt-oss-120b:free",
+    "Kimi":"moonshotai/kimi-k2.6:free"
+
 }
 
 gamePromt = lambda name, role, players: f"""Ты - игрок в мафию,твоё имя {name} твоя роль - {role}. Список всех игроков - {players}. 
@@ -28,6 +33,7 @@ class AIplayer:
     messeges = [""]
     players = []
     voteList = []
+    roles = {}
 
     def VoteResult(mafia: bool):
         voteList = AIplayer.voteList
@@ -40,6 +46,11 @@ class AIplayer:
             AIplayer.players.remove(vote[0][0])
             if  mafia: text = f"{vote[0][0]} был убит мафией"
             else:  text = f"{vote[0][0]} был исключен"
+
+            if AIplayer.roles[vote[0][0]] == "mafia":
+                AIplayer.mafia -= 1
+            else: AIplayer.peace -= 1
+
         messeges.append(text)
         AIplayer.voteList = []
         return text
@@ -59,6 +70,7 @@ class AIplayer:
         if role == "mafia":
             AIplayer.mafia += 1
         else: AIplayer.peace += 1
+        AIplayer.roles[self.name] = role
 
     #### Ходы ####
 

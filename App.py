@@ -36,7 +36,7 @@ AIplayer.client = client
 
 models = []
 
-while len(models) < 4:
+while len(models) < 5:
     modelName = input("Enter your model name: ")
     name = input("Enter your model nickname: ")
     try:
@@ -48,11 +48,13 @@ models[0].setRole("Мирный")
 models[1].setRole("mafia")
 models[2].setRole("Мирный")
 models[3].setRole("Мирный")
+models[4].setRole("Мирный")
 
 startGame()
-while AIplayer.mafia < AIplayer.peace and AIplayer.mafia > 0:
+while AIplayer.peace > AIplayer.mafia > 0:
     NightGame()
     DayGame()
 
+print("Игра завершена")
 
 
